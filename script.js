@@ -1093,7 +1093,28 @@ let cursor = 0;
 // changes on smaller screens; typography and composition never reflow.
 for (const era of archive.eras) {
   const photos = archive.images.filter(photo => photo.year === era.year);
-  const height = Math.max(1150, photos.length * 185 + 600);
+  // Positions use the projected rectangle after the sole X-axis rotation.
+  // Adjacent cards share 75% of the smaller card's projected area.
+  let previous = null;
+  const positions = photos.map((photo, index) => {
+    const width = 320 * photo.width / photo.height;
+    const height = width * photo.height / photo.width * Math.cos(20 * Math.PI / 180);
+    const targetX = 1100 + Math.cos(index * .3) * 320;
+    let centerX = targetX;
+    let centerY = 150 + height / 2;
+    if (previous) {
+      const maxStep = Math.min(previous.width, width) * .1;
+      centerX = previous.centerX + Math.max(-maxStep, Math.min(maxStep, targetX - previous.centerX));
+      const overlapWidth = Math.min(previous.centerX + previous.width / 2, centerX + width / 2)
+        - Math.max(previous.centerX - previous.width / 2, centerX - width / 2);
+      const overlapHeight = .75 * Math.min(previous.width * previous.height, width * height) / overlapWidth;
+      centerY = previous.centerY + (previous.height + height) / 2 - overlapHeight;
+    }
+    previous = {width, height, centerX, centerY};
+    return previous;
+  });
+  const last = positions.at(-1);
+  const height = Math.max(1150, last.centerY + last.height / 2 + 600);
   const section = document.createElement('section');
   section.className = 'era';
   section.id = `era-${era.year}`;
@@ -1113,18 +1134,15 @@ for (const era of archive.eras) {
   timeline.append(nav);
   chapter.nav = nav;
   photos.forEach((photo, index) => {
-    const y = cursor + 150 + index * 185;
-    // Alternating diagonals reproduce the reference's continuous ribbon.
-    const phase = (index % 12) / 11;
-    const x = 1150 + Math.cos(phase * Math.PI * 2) * 430;
-    const direction = Math.sin(phase * Math.PI * 2) >= 0 ? -1 : 1;
+    const position = positions[index];
+    const y = cursor + position.centerY - position.height / 2;
+    const x = position.centerX - position.width / 2;
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'photo';
     button.style.left = `${x}px`;
-    button.style.top = `${y - cursor}px`;
-    button.style.setProperty('--tilt', `${direction * 21}deg`);
-    button.style.setProperty('--width', `${photo.width / photo.height < .65 ? 220 : 460}px`);
+    button.style.top = `${y - cursor - (position.width * photo.height / photo.width - position.height) / 2}px`;
+    button.style.setProperty('--width', `${position.width}px`);
     button.setAttribute('aria-label', `${photo.label}, ${photo.caption} 확대`);
     const img = document.createElement('img');
     img.src = photo.src;
