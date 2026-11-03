@@ -1,16 +1,35 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!doctype html>
+<html lang="ko">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.4">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101010">
+  <title>한국 간판 100년</title>
+  <link rel="preload" href="assets/fonts/YesevaOne-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="assets/fonts/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
 </head>
 <body>
-<p class="p1">hello</p>
+  <div id="scroll-space" aria-hidden="true"></div>
+  <main id="viewport" aria-label="연대별 간판 사진">
+    <div id="stage"></div>
+  </main>
+  <div id="fixed-layout">
+    <aside class="era-heading">
+      <h1 id="current-year">1910s</h1>
+      <p id="current-event">1913 도로취체규칙 제정</p>
+    </aside>
+    <nav id="timeline" aria-label="연대 이동"></nav>
+    <aside class="photo-caption" aria-label="사진 설명">
+      <h2 id="caption-title">1910년대</h2>
+      <p id="caption-text"></p>
+    </aside>
+    <p id="era-law" class="era-law"></p>
+  </div>
+  <dialog id="image-dialog" aria-label="사진 확대">
+    <button id="back-button" type="button"><span aria-hidden="true">←</span> 뒤로가기</button>
+    <img id="enlarged-image" alt="">
+  </dialog>
 </body>
 </html>
